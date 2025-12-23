@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>QR Scanner Pro</title>
+    
+    <!-- গুগল ফন্টস -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- আইকনের জন্য FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- আমাদের কাস্টম CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- অ্যাপ হেডার -->
+    <div class="app-header">
+        <h3><i class="fa-solid fa-qrcode"></i> Scan QR</h3>
+    </div>
+
+    <!-- মেইন কন্টেইনার -->
+    <div class="main-container">
+        <!-- স্ক্যানার এরিয়া -->
+        <div id="reader"></div>
+        <p class="instruction-text">Point camera at a QR code</p>
+    </div>
+
+    <!-- রেজাল্ট পপ-আপ (Bottom Sheet) -->
+    <div id="result-sheet" class="bottom-sheet">
+        <div class="sheet-content">
+            <div class="drag-handle"></div>
+            <h3>Scanned Result</h3>
+            <div class="result-box">
+                <i class="fa-solid fa-link"></i>
+                <p id="scanned-text">Waiting for data...</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="btn-copy" onclick="copyText()">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+                <a id="btn-open" href="#" target="_blank" class="disabled">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open
+                </a>
+            </div>
+            
+            <button class="btn-close" onclick="closeSheet()">Scan Again</button>
+        </div>
+    </div>
+
+    <!-- QR স্ক্যানার লাইব্রেরি -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- আমাদের কাস্টম JS -->
+    <script src="js/script.js"></script>
+
+</body>
+</html>

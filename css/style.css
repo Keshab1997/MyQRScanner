@@ -1,0 +1,166 @@
+/* বেসিক রিসেট */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #1a1a1a; /* ডার্ক ব্যাকগ্রাউন্ড */
+    color: white;
+    height: 100vh;
+    overflow: hidden; /* অ্যাপের মতো স্ক্রল বন্ধ */
+    display: flex;
+    flex-direction: column;
+}
+
+/* হেডার ডিজাইন */
+.app-header {
+    background: #000;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+.app-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* স্ক্যানার কন্টেইনার */
+.main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#reader {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none !important;
+}
+
+/* লাইব্রেরির ডিফল্ট বর্ডার লুকানো */
+#reader__scan_region {
+    background: transparent;
+}
+video {
+    object-fit: cover;
+    border-radius: 0 !important;
+}
+
+.instruction-text {
+    position: absolute;
+    bottom: 100px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Bottom Sheet (রেজাল্ট দেখানোর জন্য) */
+.bottom-sheet {
+    position: fixed;
+    bottom: -100%; /* শুরুতে লুকিয়ে থাকবে */
+    left: 0;
+    width: 100%;
+    background: white;
+    color: #333;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    transition: bottom 0.3s ease-in-out;
+    z-index: 100;
+}
+
+.bottom-sheet.active {
+    bottom: 0; /* একটিভ হলে উপরে আসবে */
+}
+
+.sheet-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.drag-handle {
+    width: 40px;
+    height: 5px;
+    background: #ddd;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.result-box {
+    background: #f4f6f8;
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    border: 1px solid #e1e1e1;
+}
+
+#scanned-text {
+    word-break: break-all;
+    font-weight: 500;
+    color: #333;
+}
+
+/* বাটন ডিজাইন */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.action-buttons button, .action-buttons a {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+#btn-copy {
+    background: #e4e6eb;
+    color: #050505;
+}
+
+#btn-open {
+    background: #007bff;
+    color: white;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.btn-close {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
