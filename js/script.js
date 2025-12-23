@@ -1,109 +1,149 @@
-// ভেরিয়েবল ডিক্লারেশন
-const html5QrCode = new Html5Qrcode("reader"); // ম্যানুয়াল স্ক্যানার ক্লাস
-let currentCameraId = null; // বর্তমান ক্যামেরার আইডি
-let cameras = []; // সব ক্যামেরার লিস্ট
-let isScanning = false; // স্ক্যানার চলছে কিনা চেক করার জন্য
+// ভেরিয়েবল
+const html5QrCode = new Html5Qrcode("reader");
+let currentCameraId = null;
+let cameras = [];
+let isScanning = false;
+let isFlashOn = false;
 
-// ১. পেজ লোড হলে ক্যামেরা পারমিশন নেওয়া এবং লিস্ট তৈরি করা
+// ১. ইনিশিয়ালাইজেশন
 function initScanner() {
     Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
             cameras = devices;
             
-            // যদি মোবাইলে ১টি ক্যামেরা থাকে, তাহলে সুইচ বাটন লুকিয়ে ফেলা হবে
-            if (cameras.length < 2) {
-                const switchBtn = document.getElementById('swap-camera-btn');
-                if(switchBtn) switchBtn.classList.add('hidden');
+            // ক্যামেরা একাধিক থাকলে সুইচ বাটন দেখাবে
+            if (cameras.length > 1) {
+                document.getElementById('swap-camera-btn').classList.remove('hidden');
             }
 
-            // ডিফল্ট হিসেবে পেছনের ক্যামেরা (Back Camera) সিলেক্ট করা
-            // সাধারণত লিস্টের শেষের ক্যামেরাটি মেইন ক্যামেরা হয়
+            // পেছনের ক্যামেরা সিলেক্ট করা
             currentCameraId = cameras[cameras.length - 1].id;
             
-            // স্ক্যানিং শুরু করা
             startScanning(currentCameraId);
         } else {
-            alert("No cameras found on this device.");
+            alert("No cameras found.");
         }
     }).catch(err => {
         console.error("Camera Error:", err);
-        alert("Camera permission is required to scan QR codes.");
+        alert("Camera permission denied.");
     });
 }
 
-// ২. স্ক্যানিং শুরু করার ফাংশন (ন্যাচারাল ভিউ)
+// ২. স্ক্যানিং শুরু
 function startScanning(cameraId) {
-    // যদি আগে থেকেই স্ক্যানার চালু থাকে, তবে নতুন করে অন করার দরকার নেই
-    // তবে ক্যামেরা সুইচের সময় আমরা স্টপ করে আবার স্টার্ট করি
-    
     html5QrCode.start(
         cameraId, 
         {
-            fps: 10,    // প্রতি সেকেন্ডে ১০ বার স্ক্যান করবে
-            qrbox: { width: 250, height: 250 } // স্ক্যানিং বক্সের সাইজ
-            
-            // ❌ aspectRatio লাইনটি এখানে ডিলিট করা হয়েছে।
-            // এর ফলেই ক্যামেরা আর জুম হবে না, ন্যাচারাল দেখাবে।
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
         },
-        (decodedText, decodedResult) => {
-            // QR কোড পাওয়া গেলে
+        (decodedText) => {
             onScanSuccess(decodedText);
         },
         (errorMessage) => {
-            // স্ক্যানিং এরর (যেমন ফ্রেম রিড করতে না পারা) - আমরা ইগনোর করব
+            // Error ignore
         }
     ).then(() => {
         isScanning = true;
-        console.log("Camera started");
+        
+        // ক্যামেরা চালু হওয়ার পর ফ্ল্যাশ চেক করা
+        checkFlashSupport();
+        
     }).catch(err => {
-        console.error("Failed to start camera", err);
+        console.error("Start failed", err);
     });
 }
 
-// ৩. ক্যামেরা পরিবর্তন (Switch Camera) করার ফাংশন
-function switchCamera() {
-    if (cameras.length < 2) return; // ক্যামেরা ১টা হলে কাজ করবে না
+// ৩. ফ্ল্যাশ সাপোর্ট আছে কিনা চেক করা
+function checkFlashSupport() {
+    const flashBtn = document.getElementById('flash-btn');
+    
+    // ল্যাপটপে সাধারণত ফ্ল্যাশ থাকে না, তাই চেক করে বাটন দেখাতে হবে
+    html5QrCode.getRunningTrackCameraCapabilities().then(capabilities => {
+        if (capabilities.torchFeature().isSupported()) {
+            flashBtn.classList.remove('hidden'); // ফ্ল্যাশ থাকলে বাটন দেখাবে
+        } else {
+            flashBtn.classList.add('hidden'); // না থাকলে লুকিয়ে রাখবে
+        }
+    }).catch(err => {
+        // পুরনো ডিভাইসের জন্য বিকল্প চেক
+        const track = html5QrCode.getRunningTrack();
+        if (track) {
+            const imageCapture = new ImageCapture(track);
+            imageCapture.getPhotoCapabilities().then(capabilities => {
+                if (capabilities.fillLightMode && capabilities.fillLightMode.includes('flash')) {
+                   flashBtn.classList.remove('hidden');
+                }
+            }).catch(e => console.log('No flash capabilities found'));
+        }
+    });
+}
 
-    // বর্তমান ক্যামেরা বন্ধ করা
+// ৪. ফ্ল্যাশ অন/অফ ফাংশন
+function toggleFlash() {
+    if (!isScanning) return;
+
+    isFlashOn = !isFlashOn;
+    const flashBtn = document.getElementById('flash-btn');
+
+    html5QrCode.applyVideoConstraints({
+        advanced: [{ torch: isFlashOn }]
+    })
+    .then(() => {
+        if (isFlashOn) {
+            flashBtn.classList.add('flash-active');
+            flashBtn.innerHTML = '<i class="fa-solid fa-bolt-lightning"></i>';
+        } else {
+            flashBtn.classList.remove('flash-active');
+            flashBtn.innerHTML = '<i class="fa-solid fa-bolt"></i>';
+        }
+    })
+    .catch(err => {
+        console.error("Flash toggle error", err);
+        isFlashOn = !isFlashOn; // রিভার্স
+    });
+}
+
+// ৫. ক্যামেরা সুইচ
+function switchCamera() {
+    if (cameras.length < 2) return;
+
     html5QrCode.stop().then(() => {
         isScanning = false;
         
-        // বর্তমান ক্যামেরার ইনডেক্স খুঁজে বের করা
+        // ফ্ল্যাশ বন্ধ করা
+        isFlashOn = false;
+        document.getElementById('flash-btn').classList.remove('flash-active');
+
         let currentIndex = cameras.findIndex(c => c.id === currentCameraId);
-        
-        // পরের ক্যামেরা সিলেক্ট করা (চক্রাকারে ঘুরবে)
         let nextIndex = (currentIndex + 1) % cameras.length;
         currentCameraId = cameras[nextIndex].id;
 
-        // নতুন ক্যামেরা চালু করা
         startScanning(currentCameraId);
     }).catch(err => {
-        console.error("Failed to stop camera for switching", err);
+        console.error("Stop failed", err);
     });
 }
 
-// ৪. স্ক্যান সফল হলে যা হবে
+// ৬. স্ক্যান সফল হলে
 function onScanSuccess(decodedText) {
-    // সফল হলে ক্যামেরা বন্ধ করে দেওয়া (ব্যাটারি বাঁচানোর জন্য)
     html5QrCode.stop().then(() => {
         isScanning = false;
-        showResult(decodedText); // রেজাল্ট দেখানো
+        showResult(decodedText);
     }).catch(err => {
-        console.error("Failed to stop scanning", err);
+        console.error("Failed to stop", err);
     });
 }
 
-// ৫. রেজাল্ট পপ-আপ (Bottom Sheet) দেখানো
+// ৭. রেজাল্ট দেখানো
 function showResult(text) {
     const sheet = document.getElementById("result-sheet");
     const scannedTextElement = document.getElementById("scanned-text");
     const openBtn = document.getElementById("btn-open");
 
-    // টেক্সট সেট করা
     scannedTextElement.innerText = text;
-    sheet.classList.add("active"); // শিট উপরে তোলা
+    sheet.classList.add("active");
 
-    // লিংক ভ্যালিডেশন চেক করা
     if (isValidURL(text)) {
         openBtn.href = text;
         openBtn.classList.remove("disabled");
@@ -117,104 +157,55 @@ function showResult(text) {
     }
 }
 
-// ৬. "Scan Again" বাটনে ক্লিক করলে
 function closeSheet() {
-    const sheet = document.getElementById("result-sheet");
-    sheet.classList.remove("active");
-    
-    // পপ-আপ নামার পর ক্যামেরা আবার চালু হবে
+    document.getElementById("result-sheet").classList.remove("active");
     setTimeout(() => {
         startScanning(currentCameraId);
     }, 500);
 }
 
-// ৭. টেক্সট কপি করার ফাংশন
+// ৮. কপি ফাংশন
 function copyText() {
     const text = document.getElementById("scanned-text").innerText;
-    
     navigator.clipboard.writeText(text).then(() => {
         const copyBtn = document.getElementById("btn-copy");
-        const originalHTML = copyBtn.innerHTML;
+        const originalContent = copyBtn.innerHTML;
         
-        // বাটনের স্টাইল চেঞ্জ করা (Copied দেখানোর জন্য)
         copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-        copyBtn.style.background = "#d4edda"; // হালকা সবুজ
-        copyBtn.style.color = "#155724";      // গাঢ় সবুজ
-        
-        // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরে আসা
+        copyBtn.style.background = "#28a745";
+        copyBtn.style.borderColor = "#28a745";
+
         setTimeout(() => {
-            copyBtn.innerHTML = originalHTML;
-            copyBtn.style.background = "#e9ecef";
-            copyBtn.style.color = "#212529";
+            copyBtn.innerHTML = originalContent;
+            copyBtn.style.background = "#333";
+            copyBtn.style.borderColor = "#444";
         }, 2000);
-    }).catch(err => {
-        console.error("Failed to copy text", err);
     });
 }
 
-// ৮. URL ভ্যালিড কিনা চেক করার ফাংশন
 function isValidURL(string) {
-    try {
-        new URL(string);
-        return true;
-    } catch (_) {
-        return false;
-    }
+    try { new URL(string); return true; } catch (_) { return false; }
 }
 
-// পেজ পুরোপুরি লোড হলে অ্যাপ চালু হবে
+// অ্যাপ স্টার্ট
 document.addEventListener('DOMContentLoaded', initScanner);
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('Service Worker Registered'))
-      .catch(err => console.log('Service Worker Error:', err));
-  });
-}
 
-// PWA Install Button Logic
-let deferredPrompt;
+// PWA Install Logic (Safe Check)
 const installBtn = document.getElementById('installAppBtn');
+let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // ক্রোম ব্রাউজারে অটোমেটিক প্রম্পট আসা বন্ধ করা
-  e.preventDefault();
-  // ইভেন্টটি সেভ করে রাখা যাতে পরে ট্রিগার করা যায়
-  deferredPrompt = e;
-  // বাটনটি দৃশ্যমান করা
-  installBtn.style.display = 'block';
-});
-
-installBtn.addEventListener('click', () => {
-  // ইন্সটল প্রম্পট দেখানো
-  installBtn.style.display = 'none';
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      deferredPrompt = null;
+if (installBtn) {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
     });
-  }
-});
 
-// Camera Access Permission Request (Optional Helper)
-function requestCameraPermission() {
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function(stream) {
-        console.log("Camera access granted");
-        // স্ট্রীমটি যদি দরকার না হয় তবে বন্ধ করে দিন, এটি শুধু পারমিশন চেক করার জন্য
-        stream.getTracks().forEach(track => track.stop());
-    })
-    .catch(function(err) {
-        console.log("Camera access denied: ", err);
-        alert("Please allow camera access to scan QR codes.");
+    installBtn.addEventListener('click', () => {
+        installBtn.style.display = 'none';
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt = null;
+        }
     });
 }
-
-// পেজ লোড হলে একবার পারমিশন চেক করা (যদি আগে না হয়ে থাকে)
-requestCameraPermission();

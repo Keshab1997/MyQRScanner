@@ -2,49 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QR Scanner Pro</title>
+    
+    <!-- ফন্ট এবং আইকন -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#000000">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA সেটিংস -->
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- CSS ফাইল লিংক -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+    <!-- ১. হেডার -->
     <div class="app-header">
         <h3><i class="fa-solid fa-qrcode"></i> Scan QR</h3>
     </div>
 
+    <!-- ২. মেইন স্ক্যানার এরিয়া -->
     <div class="main-container">
-        <!-- ক্যামেরা ঘোরানোর বাটন (নতুন যোগ করা হয়েছে) -->
-        <button id="swap-camera-btn" class="camera-btn" onclick="switchCamera()">
+        
+        <!-- ফ্ল্যাশ লাইট বাটন (বাম পাশে) - শুরুতে hidden থাকবে -->
+        <button id="flash-btn" class="camera-btn flash-btn hidden" onclick="toggleFlash()">
+            <i class="fa-solid fa-bolt"></i>
+        </button>
+
+        <!-- ক্যামেরা ঘোরানোর বাটন (ডান পাশে) -->
+        <button id="swap-camera-btn" class="camera-btn swap-btn hidden" onclick="switchCamera()">
             <i class="fa-solid fa-camera-rotate"></i>
         </button>
 
+        <!-- ক্যামেরা ভিউ -->
         <div id="reader"></div>
+        
+        <!-- নির্দেশনা -->
         <p class="instruction-text">Point camera at a QR code</p>
     </div>
 
-    <!-- রেজাল্ট শিট (আগের মতোই) -->
+    <!-- ৩. রেজাল্ট পপ-আপ (Bottom Sheet) -->
     <div id="result-sheet" class="bottom-sheet">
         <div class="sheet-content">
             <div class="drag-handle"></div>
             <h3>Scanned Result</h3>
+            
             <div class="result-box">
                 <i class="fa-solid fa-link"></i>
                 <p id="scanned-text">Waiting...</p>
             </div>
+            
             <div class="action-buttons">
-                <button id="btn-copy" onclick="copyText()"><i class="fa-regular fa-copy"></i> Copy</button>
-                <a id="btn-open" href="#" target="_blank" class="disabled"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>
+                <button id="btn-copy" onclick="copyText()">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+                <a id="btn-open" href="#" target="_blank" class="disabled">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open
+                </a>
             </div>
+            
             <button class="btn-close" onclick="closeSheet()">Scan Again</button>
         </div>
     </div>
 
+    <!-- ইন্সটল বাটন (যদি PWA হয়) -->
+    <button id="installAppBtn" style="display:none;">Install App</button>
+
+    <!-- স্ক্রিপ্ট -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="js/script.js"></script>
 

@@ -1,4 +1,4 @@
-/* ১. বেসিক রিসেট ও অ্যাপ সেটিংস */
+/* বেসিক রিসেট */
 * {
     margin: 0;
     padding: 0;
@@ -9,7 +9,7 @@
 }
 
 body {
-    background-color: #000000; /* একদম কালো ব্যাকগ্রাউন্ড */
+    background-color: #000000;
     color: #ffffff;
     height: 100vh;
     width: 100vw;
@@ -18,14 +18,13 @@ body {
     flex-direction: column;
 }
 
-/* ২. হেডার ডিজাইন */
+/* ১. হেডার */
 .app-header {
     background: #000000;
     padding: 15px;
     text-align: center;
     z-index: 10;
-    /* নিচে হালকা বর্ডার যাতে কালো ব্যাকগ্রাউন্ডের সাথে আলাদা বোঝা যায় */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .app-header h3 {
@@ -35,7 +34,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* ৩. স্ক্যানার কন্টেইনার */
+/* ২. মেইন কন্টেইনার */
 .main-container {
     flex: 1;
     display: flex;
@@ -43,7 +42,7 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: #000; /* স্ক্যানার এরিয়া কালো */
+    background: #000;
     overflow: hidden;
 }
 
@@ -55,52 +54,28 @@ body {
     top: 0;
     left: 0;
     border: none !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 video {
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain !important; /* ভিডিওর রেশিও ঠিক রাখবে */
-    border-radius: 0 !important;
+    object-fit: contain !important; /* জুম এড়াতে contain */
 }
 
-/* অপ্রয়োজনীয় এলিমেন্ট লুকানো */
-#reader__scan_region {
-    background: transparent !important;
-}
+/* অপ্রয়োজনীয় এলিমেন্ট হাইড করা */
+#reader__scan_region { background: transparent !important; }
 #reader__dashboard_section_csr span, 
-#reader__dashboard_section_swaplink {
-    display: none !important;
-}
+#reader__dashboard_section_swaplink { display: none !important; }
 
-/* ৪. ইন্সট্রাকশন টেক্সট */
-.instruction-text {
-    position: absolute;
-    bottom: 80px;
-    background: rgba(0, 0, 0, 0.6); /* একটু বেশি ডার্ক */
-    padding: 8px 20px;
-    border-radius: 30px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.9);
-    pointer-events: none;
-    z-index: 5;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(4px);
-}
-
-/* ৫. ক্যামেরা ফ্লিপ বাটন */
+/* ৩. ফ্লোটিং বাটন (ক্যামেরা ও ফ্ল্যাশ) */
 .camera-btn {
     position: absolute;
     top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
     width: 45px;
     height: 45px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -109,34 +84,65 @@ video {
     cursor: pointer;
     z-index: 20;
     backdrop-filter: blur(5px);
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .camera-btn:active {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     transform: scale(0.95);
+}
+
+/* ফ্ল্যাশ বাটন (বাম দিকে) */
+.flash-btn {
+    left: 20px;
+}
+
+/* ক্যামেরা বাটন (ডান দিকে) */
+.swap-btn {
+    right: 20px;
+}
+
+/* ফ্ল্যাশ চালু থাকলে হলুদ গ্লো */
+.flash-active {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    color: #ff9800 !important;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+    border: none !important;
+}
+
+/* নির্দেশনা টেক্সট */
+.instruction-text {
+    position: absolute;
+    bottom: 80px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    z-index: 5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
 }
 
 .hidden {
     display: none !important;
 }
 
-/* ৬. রেজাল্ট শিট (ডার্ক মোড আপডেট) */
+/* ৪. রেজাল্ট শিট (ডার্ক মোড) */
 .bottom-sheet {
     position: fixed;
     bottom: -100%;
     left: 0;
     width: 100%;
-    /* আগে সাদা ছিল, এখন ডার্ক গ্রে করা হলো লোগোর সাথে মিল রাখতে */
-    background: #1a1a1a; 
+    background: #1a1a1a; /* ডার্ক ব্যাকগ্রাউন্ড */
     color: #ffffff;
     border-radius: 20px 20px 0 0;
-    /* উপরে হালকা বর্ডার যাতে কালোর মধ্যে বোঝা যায় */
-    border-top: 1px solid #333; 
+    border-top: 1px solid #333;
     box-shadow: 0 -5px 40px rgba(0,0,0,0.8);
     transition: bottom 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
     z-index: 100;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
 }
 
 .bottom-sheet.active {
@@ -153,14 +159,13 @@ video {
 .drag-handle {
     width: 40px;
     height: 5px;
-    background: #444; /* হ্যান্ডেল কালার ডার্ক */
+    background: #444;
     border-radius: 10px;
     margin-bottom: 15px;
 }
 
-/* রেজাল্ট বক্স ডার্ক মোড */
 .result-box {
-    background: #252525; /* কিছুটা হালকা কালো */
+    background: #252525;
     width: 100%;
     padding: 15px;
     border-radius: 12px;
@@ -168,23 +173,23 @@ video {
     align-items: center;
     gap: 12px;
     margin: 15px 0 20px 0;
-    border: 1px solid #333; /* বর্ডার কালার */
+    border: 1px solid #333;
 }
 
 .result-box i {
-    color: #aaa; /* আইকন কালার */
+    color: #aaa;
     font-size: 18px;
 }
 
 #scanned-text {
     word-break: break-all;
     font-weight: 500;
-    color: #ffffff; /* টেক্সট সাদা */
+    color: #fff;
     font-size: 15px;
     user-select: text;
 }
 
-/* ৭. বাটন ডিজাইন */
+/* ৫. বাটন গ্রুপ */
 .action-buttons {
     display: flex;
     gap: 12px;
@@ -208,24 +213,15 @@ video {
     transition: 0.2s;
 }
 
-/* কপি বাটন ডার্ক */
 #btn-copy {
     background: #333;
     color: #fff;
     border: 1px solid #444;
 }
-#btn-copy:active {
-    background: #444;
-}
 
-/* ওপেন বাটন (নীল রঙ ঠিক আছে, পপ করবে) */
 #btn-open {
     background: #007bff;
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-}
-#btn-open:active {
-    transform: translateY(2px);
 }
 
 .disabled {
@@ -233,23 +229,17 @@ video {
     pointer-events: none;
     background: #333 !important;
     color: #777 !important;
-    box-shadow: none !important;
 }
 
-/* ক্লোজ বাটন */
 .btn-close {
     width: 100%;
     margin-top: 15px;
     padding: 14px;
-    background: #ff4757; /* লাল রঙ ডার্ক থিমে ভালো লাগে */
+    background: #ff4757;
     color: white;
     border: none;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     font-size: 15px;
-    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
-}
-.btn-close:active {
-    transform: translateY(2px);
 }
