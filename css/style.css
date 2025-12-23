@@ -4,27 +4,28 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
-    -webkit-tap-highlight-color: transparent; /* মোবাইলে ক্লিকের হাইলাইট বন্ধ */
-    user-select: none; /* টেক্সট সিলেক্ট বন্ধ (অ্যাপ ফিল পাওয়ার জন্য) */
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 body {
-    background-color: #000; /* সম্পূর্ণ কালো ব্যাকগ্রাউন্ড */
-    color: white;
-    height: 100vh; /* পুরো স্ক্রিন */
+    background-color: #000000; /* একদম কালো ব্যাকগ্রাউন্ড */
+    color: #ffffff;
+    height: 100vh;
     width: 100vw;
-    overflow: hidden; /* স্ক্রল বন্ধ */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
 /* ২. হেডার ডিজাইন */
 .app-header {
-    background: #000;
+    background: #000000;
     padding: 15px;
     text-align: center;
     z-index: 10;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* নিচে হালকা বর্ডার যাতে কালো ব্যাকগ্রাউন্ডের সাথে আলাদা বোঝা যায় */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .app-header h3 {
@@ -34,19 +35,19 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* ৩. স্ক্যানার কন্টেইনার (মেইন এরিয়া) */
+/* ৩. স্ক্যানার কন্টেইনার */
 .main-container {
-    flex: 1; /* বাকি জায়গা দখল করবে */
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    background: #000;
+    background: #000; /* স্ক্যানার এরিয়া কালো */
     overflow: hidden;
 }
 
-/* ভিডিও রিডার (লাইব্রেরি কন্টেইনার) */
+/* ভিডিও রিডার */
 #reader {
     width: 100%;
     height: 100%;
@@ -59,16 +60,14 @@ body {
     justify-content: center;
 }
 
-/* 🔥 গুরুত্বপূর্ণ: ভিডিও ন্যাচারাল রাখার কোড 🔥 */
 video {
     width: 100% !important;
     height: 100% !important;
-    /* cover দিলে জুম হয়ে যায়, তাই contain ব্যবহার করা হলো */
-    object-fit: contain !important; 
+    object-fit: contain !important; /* ভিডিওর রেশিও ঠিক রাখবে */
     border-radius: 0 !important;
 }
 
-/* লাইব্রেরির ডিফল্ট বর্ডার ও টেক্সট লুকানো */
+/* অপ্রয়োজনীয় এলিমেন্ট লুকানো */
 #reader__scan_region {
     background: transparent !important;
 }
@@ -77,18 +76,19 @@ video {
     display: none !important;
 }
 
-/* ৪. ইন্সট্রাকশন টেক্সট (ভিডিওর ওপর ভাসবে) */
+/* ৪. ইন্সট্রাকশন টেক্সট */
 .instruction-text {
     position: absolute;
     bottom: 80px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6); /* একটু বেশি ডার্ক */
     padding: 8px 20px;
     border-radius: 30px;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
     pointer-events: none;
     z-index: 5;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
 }
 
 /* ৫. ক্যামেরা ফ্লিপ বাটন */
@@ -96,7 +96,7 @@ video {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     width: 45px;
@@ -113,23 +113,27 @@ video {
 }
 
 .camera-btn:active {
-    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
 }
 
 .hidden {
     display: none !important;
 }
 
-/* ৬. রেজাল্ট শিট (Bottom Sheet) */
+/* ৬. রেজাল্ট শিট (ডার্ক মোড আপডেট) */
 .bottom-sheet {
     position: fixed;
     bottom: -100%;
     left: 0;
     width: 100%;
-    background: white;
-    color: #333;
+    /* আগে সাদা ছিল, এখন ডার্ক গ্রে করা হলো লোগোর সাথে মিল রাখতে */
+    background: #1a1a1a; 
+    color: #ffffff;
     border-radius: 20px 20px 0 0;
-    box-shadow: 0 -5px 40px rgba(0,0,0,0.5);
+    /* উপরে হালকা বর্ডার যাতে কালোর মধ্যে বোঝা যায় */
+    border-top: 1px solid #333; 
+    box-shadow: 0 -5px 40px rgba(0,0,0,0.8);
     transition: bottom 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
     z-index: 100;
     padding-bottom: 20px;
@@ -149,13 +153,14 @@ video {
 .drag-handle {
     width: 40px;
     height: 5px;
-    background: #e0e0e0;
+    background: #444; /* হ্যান্ডেল কালার ডার্ক */
     border-radius: 10px;
     margin-bottom: 15px;
 }
 
+/* রেজাল্ট বক্স ডার্ক মোড */
 .result-box {
-    background: #f1f3f5;
+    background: #252525; /* কিছুটা হালকা কালো */
     width: 100%;
     padding: 15px;
     border-radius: 12px;
@@ -163,20 +168,20 @@ video {
     align-items: center;
     gap: 12px;
     margin: 15px 0 20px 0;
-    border: 1px solid #e9ecef;
+    border: 1px solid #333; /* বর্ডার কালার */
 }
 
 .result-box i {
-    color: #555;
+    color: #aaa; /* আইকন কালার */
     font-size: 18px;
 }
 
 #scanned-text {
     word-break: break-all;
     font-weight: 500;
-    color: #212529;
+    color: #ffffff; /* টেক্সট সাদা */
     font-size: 15px;
-    user-select: text; /* শুধু রেজাল্ট টেক্সট সিলেক্ট করা যাবে */
+    user-select: text;
 }
 
 /* ৭. বাটন ডিজাইন */
@@ -203,18 +208,21 @@ video {
     transition: 0.2s;
 }
 
+/* কপি বাটন ডার্ক */
 #btn-copy {
-    background: #e9ecef;
-    color: #212529;
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
 }
 #btn-copy:active {
-    background: #dee2e6;
+    background: #444;
 }
 
+/* ওপেন বাটন (নীল রঙ ঠিক আছে, পপ করবে) */
 #btn-open {
     background: #007bff;
     color: white;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 #btn-open:active {
     transform: translateY(2px);
@@ -223,23 +231,24 @@ video {
 .disabled {
     opacity: 0.5;
     pointer-events: none;
-    background: #e9ecef !important;
-    color: #adb5bd !important;
+    background: #333 !important;
+    color: #777 !important;
     box-shadow: none !important;
 }
 
+/* ক্লোজ বাটন */
 .btn-close {
     width: 100%;
     margin-top: 15px;
     padding: 14px;
-    background: #ff4757;
+    background: #ff4757; /* লাল রঙ ডার্ক থিমে ভালো লাগে */
     color: white;
     border: none;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     font-size: 15px;
-    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
 }
 .btn-close:active {
     transform: translateY(2px);
