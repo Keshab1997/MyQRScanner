@@ -164,3 +164,57 @@ function isValidURL(string) {
 
 // পেজ পুরোপুরি লোড হলে অ্যাপ চালু হবে
 document.addEventListener('DOMContentLoaded', initScanner);
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker Registered'))
+      .catch(err => console.log('Service Worker Error:', err));
+  });
+}
+
+// PWA Install Button Logic
+let deferredPrompt;
+const installBtn = document.getElementById('installAppBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // ক্রোম ব্রাউজারে অটোমেটিক প্রম্পট আসা বন্ধ করা
+  e.preventDefault();
+  // ইভেন্টটি সেভ করে রাখা যাতে পরে ট্রিগার করা যায়
+  deferredPrompt = e;
+  // বাটনটি দৃশ্যমান করা
+  installBtn.style.display = 'block';
+});
+
+installBtn.addEventListener('click', () => {
+  // ইন্সটল প্রম্পট দেখানো
+  installBtn.style.display = 'none';
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      deferredPrompt = null;
+    });
+  }
+});
+
+// Camera Access Permission Request (Optional Helper)
+function requestCameraPermission() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+        console.log("Camera access granted");
+        // স্ট্রীমটি যদি দরকার না হয় তবে বন্ধ করে দিন, এটি শুধু পারমিশন চেক করার জন্য
+        stream.getTracks().forEach(track => track.stop());
+    })
+    .catch(function(err) {
+        console.log("Camera access denied: ", err);
+        alert("Please allow camera access to scan QR codes.");
+    });
+}
+
+// পেজ লোড হলে একবার পারমিশন চেক করা (যদি আগে না হয়ে থাকে)
+requestCameraPermission();
